@@ -1,8 +1,7 @@
 package de.dhbw.wbs;
 
-import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,7 +25,7 @@ public final class Seminarplanung {
 			 *
 			 * Lecture No;subject;lecturer;group number;duration;room
 			 */
-			CSVParser lectureParser = new CSVParser(new BufferedReader(new FileReader(args[0])));
+			CSVParser lectureParser = new CSVParser(new FileInputStream(args[0]));
 
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
@@ -37,6 +36,13 @@ public final class Seminarplanung {
 				lecture.setDuration(Integer.parseInt(elems[4]));
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
 			}
+
+			/*
+			 * Parse 2nd file - lecture dependencies
+			 *
+			 * basic lecture;required lecture;;;;
+			 */
+			// TODO
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e.getMessage());
