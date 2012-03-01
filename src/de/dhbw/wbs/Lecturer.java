@@ -14,4 +14,12 @@ public class Lecturer {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	@Override
+	public boolean equals(Object aLecturer) {
+		if (!(aLecturer instanceof Lecturer))
+			return false;
+
+		return ((Lecturer) aLecturer).name == this.name;
+	}
 }

@@ -8,7 +8,7 @@ public class Lecture {
 	private Room room;
 	private int start;
 	private int duration;
-	
+
 	public int getNumber() {
 		return number;
 	}
