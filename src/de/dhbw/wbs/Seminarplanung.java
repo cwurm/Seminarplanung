@@ -1,7 +1,6 @@
 package de.dhbw.wbs;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,13 +16,18 @@ public final class Seminarplanung {
 			System.err.println("Expecting three file names as arguments.");
 			System.exit(1);
 		}
-		
+
 		// 1. Parsen
 		try {
 			Iterable<Lecture> lectures = new ArrayList<Lecture>();
-			
+
+			/*
+			 * Parse 1st file - lectures
+			 *
+			 * Lecture No;subject;lecturer;group number;duration;room
+			 */
 			CSVParser lectureParser = new CSVParser(new BufferedReader(new FileReader(args[0])));
-			
+
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
 				lecture.setNumber(Integer.parseInt(elems[0]));
@@ -40,16 +44,16 @@ public final class Seminarplanung {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		// 2. Konsistenzprüfung
-		// 2.1 Eine Vorlesung darf erst dann stattfinden, wenn die Seminargruppe alle dafür
-		//     vorausgesetzten Vorlesungen bereits gehört hat.
-		// 2.2 Lehrveranstaltungen des gleichen Dozenten oder der gleichen Seminargruppe dürfen
-		//     sich nicht überschneiden. Ebenso darf ein Raum nicht zeitgleich von zwei Vorlesungen
+
+
+		// 2. Konsistenzpruefung
+		// 2.1 Eine Vorlesung darf erst dann stattfinden, wenn die Seminargruppe alle dafuer
+		//     vorausgesetzten Vorlesungen bereits gehoert hat.
+		// 2.2 Lehrveranstaltungen des gleichen Dozenten oder der gleichen Seminargruppe duerfen
+		//     sich nicht ueberschneiden. Ebenso darf ein Raum nicht zeitgleich von zwei Vorlesungen
 		//     genutzt werden.
-		// 2.3 Zwischen zwei Lehrveranstaltungen der Länge 2 muss eine Pause sein, d.h. diese dürfen
-		//     nicht unmittelbar hintereinander laufen (gilt für Dozenten und Seminargruppen).
+		// 2.3 Zwischen zwei Lehrveranstaltungen der Laenge 2 muss eine Pause sein, d.h. diese duerfen
+		//     nicht unmittelbar hintereinander laufen (gilt fuer Dozenten und Seminargruppen).
 	}
 
 }
