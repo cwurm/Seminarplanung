@@ -4,8 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 
 public final class Seminarplanung {
 
@@ -20,7 +19,7 @@ public final class Seminarplanung {
 
 		// 1. Parsen
 		try {
-			Collection<Lecture> lectures = new ArrayList<Lecture>();
+			HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
 
 			/*
 			 * Parse 1st file - lectures
@@ -42,8 +41,8 @@ public final class Seminarplanung {
 				lecture.setGroup(new Group(Integer.parseInt(elems[3])));
 				lecture.setDuration(Integer.parseInt(elems[4]));
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
-				
-				lectures.add(lecture);
+
+				lectures.put(new Integer(lecture.getNumber()), lecture);
 			}
 
 			/*
@@ -51,7 +50,18 @@ public final class Seminarplanung {
 			 *
 			 * basic lecture;required lecture;;;;
 			 */
-			// TODO
+			BufferedReader depReader = new BufferedReader(new FileReader(args[1]));
+			// Skip the header line
+			depReader.readLine();
+			
+			CSVParser depParser = new CSVParser(depReader);
+
+			for (String[] elems : depParser.parse()) {
+				Lecture basicLecture = lectures.get(new Integer(elems[0]));
+				Lecture dependentLecture = lectures.get(new Integer(elems[1]));
+
+				dependentLecture.addRequiredLecture(basicLecture);
+			}
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e.getMessage());
