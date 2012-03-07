@@ -3,7 +3,7 @@ package de.dhbw.wbs;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public final class Seminarplanung {
 
@@ -18,7 +18,7 @@ public final class Seminarplanung {
 
 		// 1. Parsen
 		try {
-			Iterable<Lecture> lectures = new ArrayList<Lecture>();
+			HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
 
 			/*
 			 * Parse 1st file - lectures
@@ -35,6 +35,8 @@ public final class Seminarplanung {
 				lecture.setGroup(new Group(Integer.parseInt(elems[3])));
 				lecture.setDuration(Integer.parseInt(elems[4]));
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
+
+				lectures.put(new Integer(lecture.getNumber()), lecture);
 			}
 
 			/*
@@ -42,7 +44,12 @@ public final class Seminarplanung {
 			 *
 			 * basic lecture;required lecture;;;;
 			 */
-			// TODO
+			CSVParser depParser = new CSVParser(new FileInputStream(args[1]));
+
+			for (String[] elems : depParser.parse()) {
+				Lecture basicLecture = lectures.get(new Integer(elems[0]));
+				Lecture depenendentLecture = lectures.get(new Integer(elems[1]));
+			}
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e.getMessage());
