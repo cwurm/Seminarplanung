@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -99,7 +100,9 @@ public final class Seminarplanung {
 					System.exit(1);
 				}
 
-				lecture.setStartTime(startTime);
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(startTime);
+				lecture.setStartTime(cal);
 			}
 		}
 		catch (FileNotFoundException e) {

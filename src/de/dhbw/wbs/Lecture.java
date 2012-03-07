@@ -1,7 +1,7 @@
 package de.dhbw.wbs;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 
 public class Lecture {
 	private int number;
@@ -9,7 +9,7 @@ public class Lecture {
 	private Lecturer lecturer;
 	private Group group;
 	private Room room;
-	private Date startTime;
+	private Calendar startTime;
 	private int duration;
 	private final ArrayList<Lecture> requiredLectures = new ArrayList<Lecture>();
 
@@ -63,10 +63,10 @@ public class Lecture {
 	public void setRoom(Room room) {
 		this.room = room;
 	}
-	public Date getStartTime() {
+	public Calendar getStartTime() {
 		return this.startTime;
 	}
-	public void setStartTime(Date start) {
+	public void setStartTime(Calendar start) {
 		this.startTime = start;
 	}
 	public int getDuration() {
@@ -81,4 +81,64 @@ public class Lecture {
 	public Iterable<Lecture> getRequiredLectures() {
 		return this.requiredLectures;
 	}
+	public Calendar getEndTime() {
+		Calendar c = this.getStartTime();
+		c.add(Calendar.HOUR_OF_DAY, this.getDuration());
+		return c;
+	}
+	public AllenRelation getAllenRelation(Lecture rhs) {
+		if (this.getEndTime().before(rhs.getStartTime())) {
+			return AllenRelation.BEFORE;
+		}
+		else if (this.getStartTime().after(rhs.getEndTime())) {
+			return AllenRelation.AFTER;
+		}
+		else if (this.getStartTime().equals(rhs.getStartTime()) && this.getEndTime().equals(rhs.getEndTime())) {
+			return AllenRelation.EQUAL;
+		}
+		else if (this.getEndTime().equals(rhs.getStartTime())) {
+			return AllenRelation.MEETS;
+		}
+		else if (this.getStartTime().equals(rhs.getEndTime())) {
+			return AllenRelation.MEETS_INV;
+		}
+		else if (this.getStartTime().before(rhs.getStartTime()) && this.getEndTime().after(rhs.getStartTime()) && this.getEndTime().before(rhs.getEndTime())) {
+			return AllenRelation.OVERLAPS;
+		}
+		else if (this.getStartTime().after(rhs.getStartTime()) && this.getStartTime().before(rhs.getEndTime()) && this.getEndTime().after(rhs.getEndTime())) {
+			return AllenRelation.OVERLAPS_INV;
+		}
+		else if (this.getStartTime().after(rhs.getStartTime()) && this.getEndTime().before(rhs.getEndTime())) {
+			return AllenRelation.DURING;
+		}
+		else if (this.getStartTime().before(rhs.getStartTime()) && this.getEndTime().after(rhs.getEndTime())) {
+			return AllenRelation.DURING_INV;
+		}
+		else if (this.getStartTime().equals(rhs.getStartTime()) && this.getEndTime().before(rhs.getEndTime())) {
+			return AllenRelation.STARTS;
+		}
+		else if (this.getStartTime().equals(rhs.getStartTime()) && this.getEndTime().after(rhs.getEndTime())) {
+			return AllenRelation.STARTS_INV;
+		}
+		else if (this.getEndTime().equals(rhs.getEndTime()) && this.getStartTime().after(rhs.getStartTime())) {
+			return AllenRelation.FINISHES;
+		}
+		else if (this.getEndTime().equals(rhs.getEndTime()) && this.getStartTime().before(rhs.getStartTime())) {
+			return AllenRelation.FINISHES_INV;
+		}
+		else {
+			throw new RuntimeException("No fitting allen relation found for \n" + this.toString() + "\n" + rhs.toString());
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
