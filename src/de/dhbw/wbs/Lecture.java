@@ -1,5 +1,8 @@
 package de.dhbw.wbs;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 public class Lecture {
 	private int number;
 	private String name;
@@ -8,6 +11,7 @@ public class Lecture {
 	private Room room;
 	private int start;
 	private int duration;
+	private ArrayList<Lecture> requiredLectures;
 
 	public int getNumber() {
 		return number;
@@ -50,5 +54,11 @@ public class Lecture {
 	}
 	public void setDuration(int duration) {
 		this.duration = duration;
+	}
+	public void addRequiredLecture(Lecture lecture) {
+		requiredLectures.add(lecture);
+	}
+	public Iterator<Lecture> getRequiredLectures() {
+		return requiredLectures.iterator();
 	}
 }

@@ -48,7 +48,9 @@ public final class Seminarplanung {
 
 			for (String[] elems : depParser.parse()) {
 				Lecture basicLecture = lectures.get(new Integer(elems[0]));
-				Lecture depenendentLecture = lectures.get(new Integer(elems[1]));
+				Lecture dependentLecture = lectures.get(new Integer(elems[1]));
+
+				dependentLecture.addRequiredLecture(basicLecture);
 			}
 		}
 		catch (FileNotFoundException e) {
