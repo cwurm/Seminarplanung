@@ -16,6 +16,9 @@ public final class Seminarplanung {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
+		HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
+
 		if (args.length != 3) {
 			System.err.println("Expecting three file names as arguments.");
 			System.exit(1);
@@ -23,9 +26,6 @@ public final class Seminarplanung {
 
 		// 1. Parsen
 		try {
-			HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
-			HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
-
 			/*
 			 * Parse 1st file - lectures
 			 *
@@ -116,7 +116,18 @@ public final class Seminarplanung {
 		 *  2.1 A lecture may only take place of the group has already heard all lectures that this
 		 *  lecture depends on
 		 */
-		// TODO
+		for (Lecture dependentLecture : lectures.values) {
+			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
+					assertTrue(dependentLecture.getGroup() == requiredLecture.getGroup(),
+							"Lecture " + dependentLecture.getName() + "depends on lecture " +
+							requiredLecture.getName() +
+							", but the two lectures are held in different groups.");
+
+					// TODO
+					assertTrue(true, "Lecture " + dependentLecture.getName() + "depends on lecture " +
+							requiredLecture + ", but this lecture is not taught before the other lecture.");
+			}
+		}
 
 		/*
 		 * 2.2 Lectures of the same group or the same lecturer may not overlap.
@@ -129,6 +140,13 @@ public final class Seminarplanung {
 		 * seminar group.
 		 */
 		// TODO
+	}
+
+	private static void assertTrue(boolean assertion, String errMsg) {
+		if (!assertion) {
+			System.err.println(errMsg);
+			System.exit(1);
+		}
 	}
 
 }
