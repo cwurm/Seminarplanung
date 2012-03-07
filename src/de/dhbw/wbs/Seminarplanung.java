@@ -34,12 +34,12 @@ public final class Seminarplanung {
 			BufferedReader lectureReader = new BufferedReader(new FileReader(args[0]));
 			// Skip the header line
 			lectureReader.readLine();
-			
+
 			CSVParser lectureParser = new CSVParser(lectureReader);
 
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
-				
+
 				lecture.setNumber(Integer.parseInt(elems[0]));
 				lecture.setName(elems[1]);
 				lecture.setLecturer(new Lecturer(elems[2]));
@@ -58,7 +58,7 @@ public final class Seminarplanung {
 			BufferedReader depReader = new BufferedReader(new FileReader(args[1]));
 			// Skip the header line
 			depReader.readLine();
-			
+
 			CSVParser depParser = new CSVParser(depReader);
 
 			for (String[] elems : depParser.parse()) {
@@ -75,7 +75,7 @@ public final class Seminarplanung {
 			BufferedReader timeReader = new BufferedReader(new FileReader(args[2]));
 			// Skip the header line
 			timeReader.readLine();
-			
+
 			CSVParser timeParser = new CSVParser(timeReader);
 
 			for (String[] elems : timeParser.parse()) {
@@ -111,14 +111,24 @@ public final class Seminarplanung {
 		}
 
 
-		// 2. Konsistenzpruefung
-		// 2.1 Eine Vorlesung darf erst dann stattfinden, wenn die Seminargruppe alle dafuer
-		//     vorausgesetzten Vorlesungen bereits gehoert hat.
-		// 2.2 Lehrveranstaltungen des gleichen Dozenten oder der gleichen Seminargruppe duerfen
-		//     sich nicht ueberschneiden. Ebenso darf ein Raum nicht zeitgleich von zwei Vorlesungen
-		//     genutzt werden.
-		// 2.3 Zwischen zwei Lehrveranstaltungen der Laenge 2 muss eine Pause sein, d.h. diese duerfen
-		//     nicht unmittelbar hintereinander laufen (gilt fuer Dozenten und Seminargruppen).
+		// 2. Check consistency
+		/*
+		 *  2.1 A lecture may only take place of the group has already heard all lectures that this
+		 *  lecture depends on
+		 */
+		// TODO
+
+		/*
+		 * 2.2 Lectures of the same group or the same lecturer may not overlap.
+		 *     One room can be used for only one lecture at a given point of time.
+		 */
+		// TODO
+
+		/*
+		 * 2.3 There has to be a break between two lectures of length two for both the lecturerers and the
+		 * seminar group.
+		 */
+		// TODO
 	}
 
 }
