@@ -68,6 +68,7 @@ public final class Seminarplanung {
 			System.exit(1);
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(2);
 		}
 
 
