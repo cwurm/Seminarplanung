@@ -1,9 +1,11 @@
 package de.dhbw.wbs;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public final class Seminarplanung {
 
@@ -18,23 +20,30 @@ public final class Seminarplanung {
 
 		// 1. Parsen
 		try {
-			Iterable<Lecture> lectures = new ArrayList<Lecture>();
+			Collection<Lecture> lectures = new ArrayList<Lecture>();
 
 			/*
 			 * Parse 1st file - lectures
 			 *
 			 * Lecture No;subject;lecturer;group number;duration;room
 			 */
-			CSVParser lectureParser = new CSVParser(new FileInputStream(args[0]));
+			BufferedReader lectureReader = new BufferedReader(new FileReader(args[0]));
+			// Skip the header line
+			lectureReader.readLine();
+			
+			CSVParser lectureParser = new CSVParser(lectureReader);
 
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
+				
 				lecture.setNumber(Integer.parseInt(elems[0]));
 				lecture.setName(elems[1]);
 				lecture.setLecturer(new Lecturer(elems[2]));
 				lecture.setGroup(new Group(Integer.parseInt(elems[3])));
 				lecture.setDuration(Integer.parseInt(elems[4]));
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
+				
+				lectures.add(lecture);
 			}
 
 			/*
