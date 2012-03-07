@@ -2,7 +2,6 @@ package de.dhbw.wbs;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 
 public class Lecture {
 	private int number;
@@ -12,34 +11,54 @@ public class Lecture {
 	private Room room;
 	private Date startTime;
 	private int duration;
-	private ArrayList<Lecture> requiredLectures;
+	private final ArrayList<Lecture> requiredLectures = new ArrayList<Lecture>();
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Lecture: ");
+		sb.append(" Nr(" + this.getNumber() + ")");
+		sb.append(" Name(" + this.getName() + ")");
+		sb.append(" Lecturer(" + this.getLecturer().getName() + ")");
+		sb.append(" Group(" + this.getGroup().getNumber() + ")");
+		sb.append(" Room(" + this.getRoom().getNumber() + ")");
+		sb.append(" Start(" + this.getStartTime() + ")");
+		sb.append(" Duration(" + this.getDuration() + ")");
+
+		for (Lecture l: this.getRequiredLectures()) {
+			sb.append("\n    Requires: " + l.toString());
+		}
+
+		return sb.toString();
+	}
 
 	public int getNumber() {
-		return number;
+		return this.number;
 	}
 	public void setNumber(int number) {
 		this.number = number;
 	}
 	public String getName() {
-		return name;
+		return this.name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
 	public Lecturer getLecturer() {
-		return lecturer;
+		return this.lecturer;
 	}
 	public void setLecturer(Lecturer lecturer) {
 		this.lecturer = lecturer;
 	}
 	public Group getGroup() {
-		return group;
+		return this.group;
 	}
 	public void setGroup(Group group) {
 		this.group = group;
 	}
 	public Room getRoom() {
-		return room;
+		return this.room;
 	}
 	public void setRoom(Room room) {
 		this.room = room;
@@ -51,15 +70,15 @@ public class Lecture {
 		this.startTime = start;
 	}
 	public int getDuration() {
-		return duration;
+		return this.duration;
 	}
 	public void setDuration(int duration) {
 		this.duration = duration;
 	}
 	public void addRequiredLecture(Lecture lecture) {
-		requiredLectures.add(lecture);
+		this.requiredLectures.add(lecture);
 	}
-	public Iterator<Lecture> getRequiredLectures() {
-		return requiredLectures.iterator();
+	public Iterable<Lecture> getRequiredLectures() {
+		return this.requiredLectures;
 	}
 }

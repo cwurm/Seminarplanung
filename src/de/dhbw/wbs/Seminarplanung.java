@@ -1,7 +1,8 @@
 package de.dhbw.wbs;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,10 +31,15 @@ public final class Seminarplanung {
 			 *
 			 * Lecture No;subject;lecturer;group number;duration;room
 			 */
-			CSVParser lectureParser = new CSVParser(new FileInputStream(args[0]));
+			BufferedReader lectureReader = new BufferedReader(new FileReader(args[0]));
+			// Skip the header line
+			lectureReader.readLine();
+			
+			CSVParser lectureParser = new CSVParser(lectureReader);
 
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
+				
 				lecture.setNumber(Integer.parseInt(elems[0]));
 				lecture.setName(elems[1]);
 				lecture.setLecturer(new Lecturer(elems[2]));
@@ -49,7 +55,11 @@ public final class Seminarplanung {
 			 *
 			 * basic lecture;required lecture;;;;
 			 */
-			CSVParser depParser = new CSVParser(new FileInputStream(args[1]));
+			BufferedReader depReader = new BufferedReader(new FileReader(args[1]));
+			// Skip the header line
+			depReader.readLine();
+			
+			CSVParser depParser = new CSVParser(depReader);
 
 			for (String[] elems : depParser.parse()) {
 				Lecture basicLecture = lectures.get(new Integer(elems[0]));
@@ -93,6 +103,7 @@ public final class Seminarplanung {
 			System.exit(1);
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(2);
 		}
 
 
