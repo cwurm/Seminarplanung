@@ -119,7 +119,7 @@ public final class Seminarplanung {
 		 *  2.1 A lecture may only take place of the group has already heard all lectures that this
 		 *  lecture depends on
 		 */
-		for (Lecture dependentLecture : lectures.values) {
+		for (Lecture dependentLecture : lectures.values()) {
 			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
 					assertTrue(dependentLecture.getGroup() == requiredLecture.getGroup(),
 							"Lecture " + dependentLecture.getName() + "depends on lecture " +
