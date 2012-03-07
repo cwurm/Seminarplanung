@@ -72,7 +72,11 @@ public final class Seminarplanung {
 			 * Parse 3rd file - time information
 			 * group number;lecture number;start time
 			 */
-			CSVParser timeParser = new CSVParser(new FileInputStream(args[2]));
+			BufferedReader timeReader = new BufferedReader(new FileReader(args[2]));
+			// Skip the header line
+			timeReader.readLine();
+			
+			CSVParser timeParser = new CSVParser(timeReader);
 
 			for (String[] elems : timeParser.parse()) {
 				Lecture lecture = lectures.get(new Integer(elems[0]));

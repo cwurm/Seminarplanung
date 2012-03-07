@@ -64,7 +64,7 @@ public class Lecture {
 		this.room = room;
 	}
 	public Date getStartTime() {
-		return startTime;
+		return this.startTime;
 	}
 	public void setStartTime(Date start) {
 		this.startTime = start;
