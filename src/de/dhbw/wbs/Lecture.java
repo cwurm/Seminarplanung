@@ -1,6 +1,7 @@
 package de.dhbw.wbs;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 public class Lecture {
@@ -9,7 +10,7 @@ public class Lecture {
 	private Lecturer lecturer;
 	private Group group;
 	private Room room;
-	private int start;
+	private Date startTime;
 	private int duration;
 	private ArrayList<Lecture> requiredLectures;
 
@@ -43,11 +44,11 @@ public class Lecture {
 	public void setRoom(Room room) {
 		this.room = room;
 	}
-	public int getStart() {
-		return start;
+	public Date getStartTime() {
+		return startTime;
 	}
-	public void setStart(int start) {
-		this.start = start;
+	public void setStartTime(Date start) {
+		this.startTime = start;
 	}
 	public int getDuration() {
 		return duration;

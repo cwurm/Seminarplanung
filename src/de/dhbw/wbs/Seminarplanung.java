@@ -3,9 +3,13 @@ package de.dhbw.wbs;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 public final class Seminarplanung {
+	private static final SimpleDateFormat lectureTimeFormat = new SimpleDateFormat("hh:mm");
 
 	/**
 	 * @param args
@@ -19,6 +23,7 @@ public final class Seminarplanung {
 		// 1. Parsen
 		try {
 			HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
+			HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
 
 			/*
 			 * Parse 1st file - lectures
@@ -51,6 +56,36 @@ public final class Seminarplanung {
 				Lecture dependentLecture = lectures.get(new Integer(elems[1]));
 
 				dependentLecture.addRequiredLecture(basicLecture);
+			}
+
+			/*
+			 * Parse 3rd file - time information
+			 * group number;lecture number;start time
+			 */
+			CSVParser timeParser = new CSVParser(new FileInputStream(args[2]));
+
+			for (String[] elems : timeParser.parse()) {
+				Lecture lecture = lectures.get(new Integer(elems[0]));
+				Group group = groups.get(new Integer(elems[1]));
+
+				if (group != lecture.getGroup()) {
+					System.err.println("Error: The group number for lecture " + elems[1] +
+							" as supplied  in file " + args[1] + " does not match the group " +
+							"number from file " + args[0]);
+
+					System.exit(1);
+				}
+
+				Date startTime = null;
+				try {
+					startTime = lectureTimeFormat.parse(elems[2]);
+				} catch (ParseException exc) {
+					System.err.println("Error: Invalid time format " + elems[2] +
+							" in file " + args[2] + ". Expect hh:mm notation.");
+					System.exit(1);
+				}
+
+				lecture.setStartTime(startTime);
 			}
 		}
 		catch (FileNotFoundException e) {
