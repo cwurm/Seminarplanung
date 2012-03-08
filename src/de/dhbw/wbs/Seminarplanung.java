@@ -25,6 +25,10 @@ public final class Seminarplanung {
 			System.exit(1);
 		}
 
+		String lectureFileName = args[0];
+		String depFileName = args[1];
+		String timeFileName = args[2];
+
 		// 1. Parsen
 		try {
 			/*
@@ -32,7 +36,7 @@ public final class Seminarplanung {
 			 *
 			 * Lecture No;subject;lecturer;group number;duration;room
 			 */
-			BufferedReader lectureReader = new BufferedReader(new FileReader(args[0]));
+			BufferedReader lectureReader = new BufferedReader(new FileReader(lectureFileName));
 			// Skip the header line
 			lectureReader.readLine();
 
@@ -59,7 +63,7 @@ public final class Seminarplanung {
 			 *
 			 * basic lecture;required lecture;;;;
 			 */
-			BufferedReader depReader = new BufferedReader(new FileReader(args[1]));
+			BufferedReader depReader = new BufferedReader(new FileReader(depFileName));
 			// Skip the header line
 			depReader.readLine();
 
@@ -76,7 +80,7 @@ public final class Seminarplanung {
 			 * Parse 3rd file - time information
 			 * group number;lecture number;start time
 			 */
-			BufferedReader timeReader = new BufferedReader(new FileReader(args[2]));
+			BufferedReader timeReader = new BufferedReader(new FileReader(timeFileName));
 			// Skip the header line
 			timeReader.readLine();
 
@@ -88,8 +92,8 @@ public final class Seminarplanung {
 
 				if (group != lecture.getGroup()) {
 					System.err.println("Error: The group number for lecture " + elems[1] +
-							" as supplied  in file " + args[1] + " does not match the group " +
-							"number from file " + args[0]);
+							" as supplied  in file " + timeFileName + " does not match the group " +
+							"number from file " + lectureFileName);
 
 					System.exit(1);
 				}
