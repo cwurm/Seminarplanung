@@ -92,7 +92,7 @@ public final class Seminarplanung {
 
 				if (group != lecture.getGroup()) {
 					System.err.println("Error: The group number for lecture " + elems[1] +
-							" as supplied  in file " + timeFileName + " does not match the group " +
+							"(" + lecture.getName() + ") as supplied  in file " + timeFileName + " does not match the group " +
 							"number from file " + lectureFileName);
 
 					System.exit(1);
