@@ -40,11 +40,14 @@ public final class Seminarplanung {
 
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
+				Group group = groups.get(new Integer(elems[3]));
+				if (group == null)
+					group = new Group(Integer.parseInt(elems[3]));
 
 				lecture.setNumber(Integer.parseInt(elems[0]));
 				lecture.setName(elems[1]);
 				lecture.setLecturer(new Lecturer(elems[2]));
-				lecture.setGroup(new Group(Integer.parseInt(elems[3])));
+				lecture.setGroup(group);
 				lecture.setDuration(Integer.parseInt(elems[4]));
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
 
