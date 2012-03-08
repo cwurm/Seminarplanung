@@ -137,9 +137,14 @@ public final class Seminarplanung {
 							requiredLecture.getName() +
 							", but the two lectures are held in different groups.");
 
-					// TODO
-					assertTrue(true, "Lecture " + dependentLecture.getName() + "depends on lecture " +
-							requiredLecture + ", but this lecture is not taught before the other lecture.");
+					switch (requiredLecture.getAllenRelation(dependentLecture)) {
+					case BEFORE:
+					case MEETS:
+						break;
+					default:
+						assertFail("Lecture " + dependentLecture.getName() + "depends on lecture " +
+								requiredLecture + ", but this lecture is not taught before the other lecture.");
+					}
 			}
 		}
 
@@ -159,11 +164,14 @@ public final class Seminarplanung {
 		System.exit(0);
 	}
 
+	private static void assertFail(String errMsg) {
+		System.err.println(errMsg);
+		System.exit(1);
+	}
+
 	private static void assertTrue(boolean assertion, String errMsg) {
-		if (!assertion) {
-			System.err.println(errMsg);
-			System.exit(1);
-		}
+		if (!assertion)
+			assertFail(errMsg);
 	}
 
 }
