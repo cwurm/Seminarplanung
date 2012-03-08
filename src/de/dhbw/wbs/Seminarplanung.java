@@ -44,9 +44,12 @@ public final class Seminarplanung {
 
 			for (String[] elems : lectureParser.parse()) {
 				Lecture lecture = new Lecture();
-				Group group = groups.get(new Integer(elems[3]));
-				if (group == null)
-					group = new Group(Integer.parseInt(elems[3]));
+				Integer groupNumber = new Integer(elems[3]);
+				Group group = groups.get(groupNumber);
+				if (group == null) {
+					group = new Group(groupNumber);
+					groups.put(groupNumber, group);
+				}
 
 				lecture.setNumber(Integer.parseInt(elems[0]));
 				lecture.setName(elems[1]);
@@ -87,8 +90,9 @@ public final class Seminarplanung {
 			CSVParser timeParser = new CSVParser(timeReader);
 
 			for (String[] elems : timeParser.parse()) {
-				Lecture lecture = lectures.get(new Integer(elems[0]));
-				Group group = groups.get(new Integer(elems[1]));
+				Lecture lecture = lectures.get(new Integer(elems[1]));
+				Group group = groups.get(new Integer(elems[0]));
+
 
 				if (group != lecture.getGroup()) {
 					System.err.println("Error: The group number for lecture " + elems[1] +
@@ -150,6 +154,9 @@ public final class Seminarplanung {
 		 * seminar group.
 		 */
 		// TODO
+
+		System.out.println("All checks passed. File appears to be valid.");
+		System.exit(0);
 	}
 
 	private static void assertTrue(boolean assertion, String errMsg) {
