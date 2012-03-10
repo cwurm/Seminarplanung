@@ -3,8 +3,18 @@ package de.dhbw.wbs;
 import java.util.Calendar;
 
 public class TimeSpan {
-	private Calendar startTime = Calendar.getInstance();
-	private int duration = 0;
+	private Calendar startTime;
+	private int duration;
+
+	public TimeSpan() {
+		this.startTime = Calendar.getInstance();
+		this.duration = 0;
+	}
+
+	public TimeSpan(Calendar startTime, int duration) {
+		this.startTime = startTime;
+		this.duration = duration;
+	}
 
 	public Calendar getStartTime() {
 		return startTime;
