@@ -46,6 +46,7 @@ public final class Seminarplanung {
 				Lecture lecture = new Lecture();
 				Integer groupNumber = new Integer(elems[3]);
 				Group group = groups.get(groupNumber);
+
 				if (group == null) {
 					group = new Group(groupNumber);
 					groups.put(groupNumber, group);
@@ -55,8 +56,11 @@ public final class Seminarplanung {
 				lecture.setName(elems[1]);
 				lecture.setLecturer(new Lecturer(elems[2]));
 				lecture.setGroup(group);
-				lecture.setDuration(Integer.parseInt(elems[4]));
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
+
+				TimeSpan timeSpan = new TimeSpan();
+				timeSpan.setDuration(Integer.parseInt(elems[4]));
+				lecture.setTimeSpan(timeSpan);
 
 				lectures.put(new Integer(lecture.getNumber()), lecture);
 			}
@@ -113,7 +117,7 @@ public final class Seminarplanung {
 
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(startTime);
-				lecture.setStartTime(cal);
+				lecture.getTimeSpan().setStartTime(cal);
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -137,13 +141,16 @@ public final class Seminarplanung {
 							requiredLecture.getName() +
 							", but the two lectures are held in different groups.");
 
-					switch (requiredLecture.getAllenRelation(dependentLecture)) {
+					AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
+							dependentLecture.getTimeSpan());
+					switch (allenRelation) {
 					case BEFORE:
 					case MEETS:
 						break;
 					default:
 						assertFail("Lecture " + dependentLecture.getName() + "depends on lecture " +
-								requiredLecture + ", but this lecture is not taught before the other lecture.");
+								requiredLecture + ", but this lecture is not taught before the other lecture\n" +
+								"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
 					}
 			}
 		}
