@@ -183,7 +183,8 @@ public final class Seminarplanung {
 				}
 			};
 
-			checkForOverlap(lecturerPredicate.filter(lectures.values()));
+			abortIfOverlap(lecturerPredicate.filter(lectures.values()),
+					"lectures of the same lecturer may not overlap");
 		}
 
 		for (Group group : groups.values()) {
@@ -195,7 +196,8 @@ public final class Seminarplanung {
 				}
 			};
 
-			checkForOverlap(groupPredicate.filter(lectures.values()));
+			abortIfOverlap(groupPredicate.filter(lectures.values()),
+					"lectures of the same group may not overlap");
 		}
 
 		for (Room room : rooms) {
@@ -207,7 +209,8 @@ public final class Seminarplanung {
 				}
 			};
 
-			checkForOverlap(roomPredicate.filter(lectures.values()));
+			abortIfOverlap(roomPredicate.filter(lectures.values()),
+					"lectures in the same room may not overlap");
 		}
 
 		/*
@@ -220,14 +223,14 @@ public final class Seminarplanung {
 		System.exit(0);
 	}
 
-	private static void checkForOverlap(ArrayList<Lecture> lectures) {
+	private static void abortIfOverlap(ArrayList<Lecture> lectures, String cond) {
 		for (Lecture lecture1 : lectures) {
 			for (Lecture lecture2 : lectures) {
 				if (lecture1 == lecture2)
 					continue;
 
 				if (lecture1.overlapsWith(lecture2))
-					abort("Lecture " + lecture1.getName() + " overlaps with lecture " + lecture2.getName() + "\n");
+					abort("Lecture " + lecture1.toString() + " overlaps with lecture " + lecture2.toString() + ", but " + cond + "\n");
 			}
 		}
 	}
