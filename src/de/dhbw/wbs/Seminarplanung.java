@@ -183,7 +183,7 @@ public final class Seminarplanung {
 				}
 			};
 
-			checkForOverlap(lecturerPredicate.getFilteredList(lectures.values()));
+			checkForOverlap(lecturerPredicate.filter(lectures.values()));
 		}
 
 		for (Group group : groups.values()) {
@@ -195,7 +195,7 @@ public final class Seminarplanung {
 				}
 			};
 
-			checkForOverlap(groupPredicate.getFilteredList(lectures.values()));
+			checkForOverlap(groupPredicate.filter(lectures.values()));
 		}
 
 		for (Room room : rooms) {
@@ -207,7 +207,7 @@ public final class Seminarplanung {
 				}
 			};
 
-			checkForOverlap(roomPredicate.getFilteredList(lectures.values()));
+			checkForOverlap(roomPredicate.filter(lectures.values()));
 		}
 
 		/*
