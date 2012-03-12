@@ -1,6 +1,7 @@
 package de.dhbw.wbs;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class Lecture {
 	private int number;
@@ -8,27 +9,45 @@ public class Lecture {
 	private Lecturer lecturer;
 	private Group group;
 	private Room room;
-	private TimeSpan timeSpan;
+	private int duration;
+	private Calendar startTime;
 	private final ArrayList<Lecture> requiredLectures = new ArrayList<Lecture>();
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(this.getClass().getName());
 
-		sb.append("Lecture: ");
-		sb.append(" Nr(" + this.getNumber() + ")");
-		sb.append(" Name(" + this.getName() + ")");
-		sb.append(" Lecturer(" + this.getLecturer().getName() + ")");
-		sb.append(" Group(" + this.getGroup().getNumber() + ")");
-		sb.append(" Room(" + this.getRoom().getNumber() + ")");
-		sb.append(" Start(" + this.getTimeSpan().getStartTime() + ")");
-		sb.append(" Duration(" + this.getTimeSpan().getDuration() + ")");
+		sb.append("[number=" + this.getNumber() + ",");
+		sb.append("name=\"" + this.getName() + "\",");
+		sb.append("lecturer=" + this.getLecturer().getName() + ",");
+		sb.append("group=" + this.getGroup().getNumber() + ",");
+		sb.append("room=" + this.getRoom().getNumber() + ",");
+
+		if (this.getStartTime() != null) {
+			sb.append("start=" + this.getStartTime().get(Calendar.HOUR_OF_DAY) + ":"
+						+ this.getStartTime().get(Calendar.MINUTE) + ",");
+		}
+		else {
+			sb.append("start=null,");
+		}
+
+		sb.append("duration=" + this.getTimeSpan().getDuration() + "]");
+
+		return sb.toString();
+	}
+
+	public String toLongString() {
+		StringBuilder sb = new StringBuilder(this.toString());
 
 		for (Lecture l: this.getRequiredLectures()) {
 			sb.append("\n    Requires: " + l.toString());
 		}
 
 		return sb.toString();
+	}
+
+	public boolean isTakingPlace() {
+		return this.startTime != null;
 	}
 
 	public int getNumber() {
@@ -62,10 +81,13 @@ public class Lecture {
 		this.room = room;
 	}
 	public TimeSpan getTimeSpan() {
-		return this.timeSpan;
+		return new TimeSpan(this.getStartTime(), this.getDuration());
 	}
-	public void setTimeSpan(TimeSpan timeSpan) {
-		this.timeSpan = timeSpan;
+	public void setStartTime(Calendar startTime) {
+		this.startTime = startTime;
+	}
+	private Calendar getStartTime() {
+		return this.startTime;
 	}
 	public void addRequiredLecture(Lecture lecture) {
 		this.requiredLectures.add(lecture);
@@ -85,6 +107,13 @@ public class Lecture {
 		default:
 			return true;
 		}
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+	private int getDuration() {
+		return this.duration;
 	}
 }
 
