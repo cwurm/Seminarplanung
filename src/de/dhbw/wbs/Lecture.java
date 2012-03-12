@@ -73,6 +73,19 @@ public class Lecture {
 	public Iterable<Lecture> getRequiredLectures() {
 		return this.requiredLectures;
 	}
+
+	public boolean overlapsWith(Lecture aLecture) {
+		AllenRelation allenRelation = AllenRelation.getAllenRelation(this.getTimeSpan(), aLecture.getTimeSpan());
+		switch(allenRelation) {
+		case BEFORE:
+		case AFTER:
+		case MEETS:
+		case MEETS_INV:
+			return false;
+		default:
+			return true;
+		}
+	}
 }
 
 
