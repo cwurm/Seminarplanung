@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import de.dhbw.wbs.predicate.GroupPredicate;
 import de.dhbw.wbs.predicate.LecturerPredicate;
+import de.dhbw.wbs.predicate.Predicate;
 import de.dhbw.wbs.predicate.RoomPredicate;
 
 public final class Seminarplanung {
@@ -22,10 +23,10 @@ public final class Seminarplanung {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
-		HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
-		ArrayList<Lecturer> lecturers = new ArrayList<Lecturer>();
-		ArrayList<Room> rooms = new ArrayList<Room>();
+		final HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
+		final HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
+		final ArrayList<Lecturer> lecturers = new ArrayList<Lecturer>();
+		final ArrayList<Room> rooms = new ArrayList<Room>();
 
 		if (args.length != 3) {
 			System.err.println("Expecting three file names as arguments.");
@@ -140,34 +141,42 @@ public final class Seminarplanung {
 
 
 		// 2. Check consistency
+
+		ArrayList<Lecture> heldLectures = (new Predicate<Lecture>() {
+
+			@Override
+			public boolean matches(Lecture aLecture) {
+				return aLecture.isTakingPlace();
+			}
+
+		}).apply(lectures.values());
+
 		/*
 		 *  2.1 A lecture may only take place of the group has already heard all lectures that this
 		 *  lecture depends on
 		 */
-		for (Lecture dependentLecture : lectures.values()) {
-			if (dependentLecture.isTakingPlace()) {
-				for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
-					assertTrue(dependentLecture.getGroup() == requiredLecture.getGroup(),
-							"Lecture " + dependentLecture.getName() + "depends on lecture " +
-							requiredLecture.getName() +
-							", but the two lectures are held in different groups.");
+		for (Lecture dependentLecture : heldLectures) {
+			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
+				assertTrue(dependentLecture.getGroup() == requiredLecture.getGroup(),
+						"Lecture " + dependentLecture.getName() + "depends on lecture " +
+								requiredLecture.getName() +
+						", but the two lectures are held in different groups.");
 
-					if (!requiredLecture.isTakingPlace()) {
+				if (!requiredLecture.isTakingPlace()) {
+					abort("Lecture " + dependentLecture + " depends on lecture " +
+							requiredLecture + ", but this lecture is not taught at all.");
+				}
+				else {
+					AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
+							dependentLecture.getTimeSpan());
+					switch (allenRelation) {
+					case BEFORE:
+					case MEETS:
+						break;
+					default:
 						abort("Lecture " + dependentLecture + " depends on lecture " +
-											requiredLecture + ", but this lecture is not taught at all.");
-					}
-					else {
-						AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
-								dependentLecture.getTimeSpan());
-						switch (allenRelation) {
-						case BEFORE:
-						case MEETS:
-							break;
-						default:
-							abort("Lecture " + dependentLecture + " depends on lecture " +
-									requiredLecture + ", but this lecture is not taught before the other lecture\n" +
-									"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
-						}
+								requiredLecture + ", but this lecture is not taught before the other lecture\n" +
+								"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
 					}
 				}
 			}
@@ -179,17 +188,17 @@ public final class Seminarplanung {
 		 */
 
 		for (Lecturer lecturer : lecturers) {
-			abortIfOverlap((new LecturerPredicate(lecturer)).apply(lectures.values()),
+			abortIfOverlap((new LecturerPredicate(lecturer)).apply(heldLectures),
 					"lectures of the same lecturer may not overlap");
 		}
 
 		for (Group group : groups.values()) {
-			abortIfOverlap((new GroupPredicate(group)).apply(lectures.values()),
+			abortIfOverlap((new GroupPredicate(group)).apply(heldLectures),
 					"lectures of the same group may not overlap");
 		}
 
 		for (Room room : rooms) {
-			abortIfOverlap((new RoomPredicate(room)).apply(lectures.values()),
+			abortIfOverlap((new RoomPredicate(room)).apply(heldLectures),
 					"lectures in the same room may not overlap");
 		}
 
