@@ -7,11 +7,6 @@ public class TimeSpan {
 	private Calendar startTime;
 	private int duration;
 
-	public TimeSpan() {
-		this.startTime = Calendar.getInstance();
-		this.duration = 0;
-	}
-
 	public TimeSpan(Calendar startTime, int duration) {
 		this.startTime = startTime;
 		this.duration = duration;

@@ -57,10 +57,7 @@ public final class Seminarplanung {
 				lecture.setLecturer(new Lecturer(elems[2]));
 				lecture.setGroup(group);
 				lecture.setRoom(new Room(Integer.parseInt(elems[5])));
-
-				TimeSpan timeSpan = new TimeSpan();
-				timeSpan.setDuration(Integer.parseInt(elems[4]));
-				lecture.setTimeSpan(timeSpan);
+				lecture.setDuration(Integer.parseInt(elems[4]));
 
 				lectures.put(new Integer(lecture.getNumber()), lecture);
 			}
@@ -117,7 +114,7 @@ public final class Seminarplanung {
 
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(startTime);
-				lecture.getTimeSpan().setStartTime(cal);
+				lecture.setStartTime(cal);
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -135,23 +132,31 @@ public final class Seminarplanung {
 		 *  lecture depends on
 		 */
 		for (Lecture dependentLecture : lectures.values()) {
-			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
+			if (dependentLecture.isTakingPlace()) {
+				for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
 					assertTrue(dependentLecture.getGroup() == requiredLecture.getGroup(),
 							"Lecture " + dependentLecture.getName() + "depends on lecture " +
 							requiredLecture.getName() +
 							", but the two lectures are held in different groups.");
-
-					AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
-							dependentLecture.getTimeSpan());
-					switch (allenRelation) {
-					case BEFORE:
-					case MEETS:
-						break;
-					default:
-						assertFail("Lecture " + dependentLecture + " depends on lecture " +
-								requiredLecture + ", but this lecture is not taught before the other lecture\n" +
-								"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
+					
+					if (!requiredLecture.isTakingPlace()) {
+						abort("Lecture " + dependentLecture + " depends on lecture " +
+											requiredLecture + ", but this lecture is not taught at all.");
 					}
+					else {
+						AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
+								dependentLecture.getTimeSpan());
+						switch (allenRelation) {
+						case BEFORE:
+						case MEETS:
+							break;
+						default:
+							abort("Lecture " + dependentLecture + " depends on lecture " +
+									requiredLecture + ", but this lecture is not taught before the other lecture\n" +
+									"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
+						}
+					}
+				}
 			}
 		}
 
@@ -171,14 +176,15 @@ public final class Seminarplanung {
 		System.exit(0);
 	}
 
-	private static void assertFail(String errMsg) {
+	private static void abort(String errMsg) {
 		System.err.println(errMsg);
+		System.err.println("Abort.");
 		System.exit(1);
 	}
 
 	private static void assertTrue(boolean assertion, String errMsg) {
 		if (!assertion)
-			assertFail(errMsg);
+			abort(errMsg);
 	}
 
 }

@@ -9,7 +9,8 @@ public class Lecture {
 	private Lecturer lecturer;
 	private Group group;
 	private Room room;
-	private TimeSpan timeSpan;
+	private int duration;
+	private Calendar startTime;
 	private final ArrayList<Lecture> requiredLectures = new ArrayList<Lecture>();
 
 	@Override
@@ -21,8 +22,15 @@ public class Lecture {
 		sb.append("lecturer=" + this.getLecturer().getName() + ",");
 		sb.append("group=" + this.getGroup().getNumber() + ",");
 		sb.append("room=" + this.getRoom().getNumber() + ",");
-		sb.append("start=" + this.getTimeSpan().getStartTime().get(Calendar.HOUR_OF_DAY) + ":"
-					+ this.getTimeSpan().getStartTime().get(Calendar.MINUTE) + ",");
+		
+		if (this.getStartTime() != null) {
+			sb.append("start=" + this.getStartTime().get(Calendar.HOUR_OF_DAY) + ":"
+						+ this.getStartTime().get(Calendar.MINUTE) + ",");
+		}
+		else {
+			sb.append("start=null,");
+		}
+		
 		sb.append("duration=" + this.getTimeSpan().getDuration() + "]");
 
 		return sb.toString();
@@ -36,6 +44,10 @@ public class Lecture {
 		}
 
 		return sb.toString();
+	}
+	
+	public boolean isTakingPlace() {
+		return this.startTime != null;
 	}
 
 	public int getNumber() {
@@ -69,16 +81,25 @@ public class Lecture {
 		this.room = room;
 	}
 	public TimeSpan getTimeSpan() {
-		return this.timeSpan;
+		return new TimeSpan(this.getStartTime(), this.getDuration());
 	}
-	public void setTimeSpan(TimeSpan timeSpan) {
-		this.timeSpan = timeSpan;
+	public void setStartTime(Calendar startTime) {
+		this.startTime = startTime;
+	}
+	private Calendar getStartTime() {
+		return this.startTime;
 	}
 	public void addRequiredLecture(Lecture lecture) {
 		this.requiredLectures.add(lecture);
 	}
 	public Iterable<Lecture> getRequiredLectures() {
 		return this.requiredLectures;
+	}
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+	private int getDuration() {
+		return this.duration;
 	}
 }
 
