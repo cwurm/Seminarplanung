@@ -1,6 +1,7 @@
 package de.dhbw.wbs;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class Lecture {
 	private int number;
@@ -13,17 +14,23 @@ public class Lecture {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(this.getClass().getName());
 
-		sb.append("Lecture: ");
-		sb.append(" Nr(" + this.getNumber() + ")");
-		sb.append(" Name(" + this.getName() + ")");
-		sb.append(" Lecturer(" + this.getLecturer().getName() + ")");
-		sb.append(" Group(" + this.getGroup().getNumber() + ")");
-		sb.append(" Room(" + this.getRoom().getNumber() + ")");
-		sb.append(" Start(" + this.getTimeSpan().getStartTime() + ")");
-		sb.append(" Duration(" + this.getTimeSpan().getDuration() + ")");
+		sb.append("[number=" + this.getNumber() + ",");
+		sb.append("name=\"" + this.getName() + "\",");
+		sb.append("lecturer=" + this.getLecturer().getName() + ",");
+		sb.append("group=" + this.getGroup().getNumber() + ",");
+		sb.append("room=" + this.getRoom().getNumber() + ",");
+		sb.append("start=" + this.getTimeSpan().getStartTime().get(Calendar.HOUR_OF_DAY) + ":"
+					+ this.getTimeSpan().getStartTime().get(Calendar.MINUTE) + ",");
+		sb.append("duration=" + this.getTimeSpan().getDuration() + "]");
 
+		return sb.toString();
+	}
+	
+	public String toLongString() {
+		StringBuilder sb = new StringBuilder(this.toString());
+		
 		for (Lecture l: this.getRequiredLectures()) {
 			sb.append("\n    Requires: " + l.toString());
 		}

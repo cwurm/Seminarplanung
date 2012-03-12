@@ -1,6 +1,7 @@
 package de.dhbw.wbs;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class TimeSpan {
 	private Calendar startTime;
@@ -17,7 +18,7 @@ public class TimeSpan {
 	}
 
 	public Calendar getStartTime() {
-		return startTime;
+		return (Calendar) this.startTime.clone();
 	}
 
 	public void setStartTime(Calendar start) {

@@ -148,7 +148,7 @@ public final class Seminarplanung {
 					case MEETS:
 						break;
 					default:
-						assertFail("Lecture " + dependentLecture.getName() + "depends on lecture " +
+						assertFail("Lecture " + dependentLecture + " depends on lecture " +
 								requiredLecture + ", but this lecture is not taught before the other lecture\n" +
 								"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
 					}
