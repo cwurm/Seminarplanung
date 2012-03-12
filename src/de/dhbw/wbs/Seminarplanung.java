@@ -11,6 +11,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import de.dhbw.wbs.predicate.GroupPredicate;
+import de.dhbw.wbs.predicate.LecturerPredicate;
+import de.dhbw.wbs.predicate.RoomPredicate;
+
 public final class Seminarplanung {
 	private static final SimpleDateFormat lectureTimeFormat = new SimpleDateFormat("hh:mm");
 
@@ -175,46 +179,22 @@ public final class Seminarplanung {
 		 */
 
 		for (Lecturer lecturer : lecturers) {
-			final Lecturer lecturerCopy = lecturer;
-			Predicate<Lecture> lecturerPredicate = new Predicate<Lecture>() {
-				@Override
-				public boolean matches(Lecture aLecture) {
-					return aLecture.getLecturer().equals(lecturerCopy);
-				}
-			};
-
-			abortIfOverlap(lecturerPredicate.filter(lectures.values()),
+			abortIfOverlap((new LecturerPredicate(lecturer)).apply(lectures.values()),
 					"lectures of the same lecturer may not overlap");
 		}
 
 		for (Group group : groups.values()) {
-			final Group groupCopy = group;
-			Predicate<Lecture> groupPredicate = new Predicate<Lecture>() {
-				@Override
-				public boolean matches(Lecture aLecture) {
-					return aLecture.getGroup().equals(groupCopy);
-				}
-			};
-
-			abortIfOverlap(groupPredicate.filter(lectures.values()),
+			abortIfOverlap((new GroupPredicate(group)).apply(lectures.values()),
 					"lectures of the same group may not overlap");
 		}
 
 		for (Room room : rooms) {
-			final Room roomCopy = room;
-			Predicate<Lecture> roomPredicate = new Predicate<Lecture>() {
-				@Override
-				public boolean matches(Lecture aLecture) {
-					return aLecture.getRoom().equals(roomCopy);
-				}
-			};
-
-			abortIfOverlap(roomPredicate.filter(lectures.values()),
+			abortIfOverlap((new RoomPredicate(room)).apply(lectures.values()),
 					"lectures in the same room may not overlap");
 		}
 
 		/*
-		 * 2.3 There has to be a break between two lectures of length two for both the lecturerers and the
+		 * 2.3 There has to be a break between two lectures of length two for both the lecturers and the
 		 * seminar group.
 		 */
 		// TODO

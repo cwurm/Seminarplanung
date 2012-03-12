@@ -112,7 +112,7 @@ public class Lecture {
 	public void setDuration(int duration) {
 		this.duration = duration;
 	}
-	private int getDuration() {
+	public int getDuration() {
 		return this.duration;
 	}
 }
