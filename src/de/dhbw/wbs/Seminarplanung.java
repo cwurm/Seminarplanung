@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import de.dhbw.wbs.predicate.DurationPredicate;
 import de.dhbw.wbs.predicate.GroupPredicate;
 import de.dhbw.wbs.predicate.LecturerPredicate;
 import de.dhbw.wbs.predicate.Predicate;
@@ -206,7 +207,21 @@ public final class Seminarplanung {
 		 * 2.3 There has to be a break between two lectures of length two for both the lecturers and the
 		 * seminar group.
 		 */
-		// TODO
+		ArrayList<Lecture> lengthTwoLectures = (new DurationPredicate(2)).apply(heldLectures);
+		for (Lecture lecture1 : lengthTwoLectures) {
+			for (Lecture lecture2 : lengthTwoLectures) {
+				if (lecture1 == lecture2)
+					continue;
+
+				AllenRelation rel = AllenRelation.getAllenRelation(lecture1.getTimeSpan(),
+						lecture2.getTimeSpan());
+
+				if (rel == AllenRelation.MEETS) {
+					abort("Lecture " + lecture1.toString() + " is held directly after " + lecture2.toString() +
+							", but both lectures are of length two.");
+				}
+			}
+		}
 
 		System.out.println("All checks passed. File appears to be valid.");
 		System.exit(0);
