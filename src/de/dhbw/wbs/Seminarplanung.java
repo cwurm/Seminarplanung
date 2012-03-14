@@ -41,7 +41,7 @@ public final class Seminarplanung {
 	 *  2.1 A lecture may only take place of the group has already heard all lectures that this
 	 *  lecture depends on
 	 */
-	public boolean validateDependencies() {
+	private boolean validateDependencies() {
 		for (Lecture dependentLecture : getHeldLectures()) {
 			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
 				if (!dependentLecture.getGroup().equals(requiredLecture.getGroup())) {
@@ -82,7 +82,7 @@ public final class Seminarplanung {
 	 * 2.2 Lectures of the same group or the same lecturer may not overlap.
 	 *     One room can be used for only one lecture at a given point of time.
 	 */
-	public boolean validateOverlaps() {
+	private boolean validateOverlaps() {
 		final ArrayList<Lecture> heldLectures = getHeldLectures();
 
 		for (Lecturer lecturer : getLecturers()) {
@@ -113,7 +113,7 @@ public final class Seminarplanung {
 	 * 2.3 There has to be a break between two lectures of length two for both the lecturers and the
 	 * seminar group.
 	 */
-	public boolean validateBreaks() {
+	private boolean validateBreaks() {
 		ArrayList<Lecture> lengthTwoLectures = (new DurationPredicate(2)).apply(getHeldLectures());
 		for (Lecture lecture1 : lengthTwoLectures) {
 			for (Lecture lecture2 : lengthTwoLectures) {
