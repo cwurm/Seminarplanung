@@ -20,6 +20,6 @@ public class Lecturer {
 		if (!(aLecturer instanceof Lecturer))
 			return false;
 
-		return ((Lecturer) aLecturer).name == this.name;
+		return ((Lecturer) aLecturer).name.equals(this.name);
 	}
 }
