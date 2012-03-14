@@ -301,20 +301,20 @@ public final class Seminarplanung {
 
 
 				if (group != lecture.getGroup()) {
-					System.err.println("Error: The group number for lecture " + elems[1] +
+					logError("The group number for lecture " + elems[1] +
 							"(" + lecture.getName() + ") as supplied  in file " + timeFileName + " does not match the group " +
 							"number from file " + lectureFileName);
 
-					System.exit(1);
+					return null;
 				}
 
 				Date startTime = null;
 				try {
 					startTime = lectureTimeFormat.parse(elems[2]);
 				} catch (ParseException exc) {
-					System.err.println("Error: Invalid time format " + elems[2] +
+					logError("Invalid time format " + elems[2] +
 							" in file " + timeFileName + ". Expect hh:mm notation.");
-					System.exit(1);
+					return null;
 				}
 
 				Calendar cal = Calendar.getInstance();
@@ -324,10 +324,10 @@ public final class Seminarplanung {
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + e.getMessage());
-			System.exit(1);
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit(2);
+			return null;
 		}
 
 		return seminarplanung;
