@@ -20,15 +20,185 @@ import de.dhbw.wbs.predicate.RoomPredicate;
 public final class Seminarplanung {
 	private static final SimpleDateFormat lectureTimeFormat = new SimpleDateFormat("hh:mm");
 
+	private final ArrayList<Lecture> lectures = new ArrayList<Lecture>();
+
+	public Seminarplanung() {
+
+	}
+
+	public void addLecture(Lecture lecture) {
+		lectures.add(lecture);
+	}
+
+	public boolean isValid() {
+
+		return validateDependencies() &&
+				validateOverlaps() &&
+				validateBreaks();
+	}
+
+	/*
+	 *  2.1 A lecture may only take place of the group has already heard all lectures that this
+	 *  lecture depends on
+	 */
+	public boolean validateDependencies() {
+		for (Lecture dependentLecture : getHeldLectures()) {
+			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
+				if (!dependentLecture.getGroup().equals(requiredLecture.getGroup())) {
+					logError("Lecture " + dependentLecture.getName() + "depends on lecture " +
+							requiredLecture.getName() +
+							", but the two lectures are held in different groups.");
+					return false;
+				}
+
+
+				if (!requiredLecture.isTakingPlace()) {
+					logError("Lecture " + dependentLecture + " depends on lecture " +
+							requiredLecture + ", but this lecture is not taught at all.");
+					return false;
+				}
+				else {
+					AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
+							dependentLecture.getTimeSpan());
+					switch (allenRelation) {
+					case BEFORE:
+					case MEETS:
+						break;
+					default:
+						logError("Lecture " + dependentLecture + " depends on lecture " +
+								requiredLecture + ", but this lecture is not taught before the other lecture\n" +
+								"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
+
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/*
+	 * 2.2 Lectures of the same group or the same lecturer may not overlap.
+	 *     One room can be used for only one lecture at a given point of time.
+	 */
+	public boolean validateOverlaps() {
+		final ArrayList<Lecture> heldLectures = getHeldLectures();
+
+		for (Lecturer lecturer : getLecturers()) {
+			if (haveOverlap((new LecturerPredicate(lecturer)).apply(heldLectures))) {
+				logError("lectures of the same lecturer may not overlap");
+				return false;
+			}
+		}
+
+		for (Group group : getGroups()) {
+			if (haveOverlap((new GroupPredicate(group)).apply(heldLectures))) {
+				logError("lectures of the same group may not overlap");
+				return false;
+			}
+		}
+
+		for (Room room : getRooms()) {
+			if (haveOverlap((new RoomPredicate(room)).apply(heldLectures))) {
+				logError("lectures in the same room may not overlap");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/*
+	 * 2.3 There has to be a break between two lectures of length two for both the lecturers and the
+	 * seminar group.
+	 */
+	public boolean validateBreaks() {
+		ArrayList<Lecture> lengthTwoLectures = (new DurationPredicate(2)).apply(getHeldLectures());
+		for (Lecture lecture1 : lengthTwoLectures) {
+			for (Lecture lecture2 : lengthTwoLectures) {
+				if (lecture1 == lecture2)
+					continue;
+
+				AllenRelation rel = AllenRelation.getAllenRelation(lecture1.getTimeSpan(),
+						lecture2.getTimeSpan());
+
+				if (rel == AllenRelation.MEETS) {
+					logError("Lecture " + lecture1.toString() + " is held directly after " + lecture2.toString() +
+							", but both lectures are of length two.");
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private boolean haveOverlap(ArrayList<Lecture> lectures) {
+		for (Lecture lecture1 : lectures) {
+			for (Lecture lecture2 : lectures) {
+				if (lecture1 == lecture2)
+					continue;
+
+				if (lecture1.overlapsWith(lecture2)) {
+					logError("Lecture " + lecture1.toString() + " overlaps with lecture " + lecture2.toString() + "\n");
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public ArrayList<Lecture> getHeldLectures() {
+		ArrayList<Lecture> heldLectures = (new Predicate<Lecture>() {
+
+			@Override
+			public boolean matches(Lecture aLecture) {
+				return aLecture.isTakingPlace();
+			}
+
+		}).apply(lectures);
+
+		return heldLectures;
+	}
+
+	public ArrayList<Group> getGroups() {
+		ArrayList<Group> groups = new ArrayList<Group>();
+
+		for (Lecture lecture : lectures) {
+			if (!groups.contains(lecture.getGroup()))
+				groups.add(lecture.getGroup());
+		}
+
+		return groups;
+	}
+
+	public ArrayList<Lecturer> getLecturers() {
+		ArrayList<Lecturer> lecturers = new ArrayList<Lecturer>();
+
+		for (Lecture lecture : lectures) {
+			if (!lecturers.contains(lecture.getLecturer()))
+				lecturers.add(lecture.getLecturer());
+		}
+
+		return lecturers;
+	}
+
+	public ArrayList<Room> getRooms() {
+		ArrayList<Room> rooms = new ArrayList<Room>();
+
+		for (Lecture lecture : lectures) {
+			if (!rooms.contains(lecture.getRoom()))
+				rooms.add(lecture.getRoom());
+		}
+
+		return rooms;
+	}
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
-		final HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
-		final ArrayList<Lecturer> lecturers = new ArrayList<Lecturer>();
-		final ArrayList<Room> rooms = new ArrayList<Room>();
-
 		if (args.length != 3) {
 			System.err.println("Expecting three file names as arguments.");
 			System.exit(1);
@@ -38,7 +208,29 @@ public final class Seminarplanung {
 		String depFileName = args[1];
 		String timeFileName = args[2];
 
-		// 1. Parsen
+		Seminarplanung seminarplanung = Seminarplanung.loadFromFile(lectureFileName, depFileName, timeFileName);
+		if (seminarplanung == null) {
+			logError("A parse error occured.\n");
+			System.exit(1);
+		}
+
+		if (!seminarplanung.isValid()) {
+			logError("The loaded seminar plan is not valid.");
+			System.exit(1);
+		}
+
+		System.out.println("All checks passed. File appears to be valid.");
+		System.exit(0);
+	}
+
+	public static Seminarplanung loadFromFile(String lectureFileName, String depFileName,
+			String timeFileName) {
+
+		final Seminarplanung seminarplanung = new Seminarplanung();
+
+		final HashMap<Integer, Lecture> lectures = new HashMap<Integer, Lecture>();
+		final HashMap<Integer, Group> groups = new HashMap<Integer, Group>();
+
 		try {
 			/*
 			 * Parse 1st file - lectures
@@ -64,11 +256,9 @@ public final class Seminarplanung {
 
 				Lecturer lecturer = new Lecturer(elems[2]);
 				lecture.setLecturer(lecturer);
-				lecturers.add(lecturer);
 
 				Room room = new Room(Integer.parseInt(elems[5]));
 				lecture.setRoom(room);
-				rooms.add(room);
 
 				lecture.setNumber(Integer.parseInt(elems[0]));
 				lecture.setName(elems[1]);
@@ -123,7 +313,7 @@ public final class Seminarplanung {
 					startTime = lectureTimeFormat.parse(elems[2]);
 				} catch (ParseException exc) {
 					System.err.println("Error: Invalid time format " + elems[2] +
-							" in file " + args[2] + ". Expect hh:mm notation.");
+							" in file " + timeFileName + ". Expect hh:mm notation.");
 					System.exit(1);
 				}
 
@@ -140,114 +330,10 @@ public final class Seminarplanung {
 			System.exit(2);
 		}
 
-
-		// 2. Check consistency
-
-		ArrayList<Lecture> heldLectures = (new Predicate<Lecture>() {
-
-			@Override
-			public boolean matches(Lecture aLecture) {
-				return aLecture.isTakingPlace();
-			}
-
-		}).apply(lectures.values());
-
-		/*
-		 *  2.1 A lecture may only take place of the group has already heard all lectures that this
-		 *  lecture depends on
-		 */
-		for (Lecture dependentLecture : heldLectures) {
-			for (Lecture requiredLecture : dependentLecture.getRequiredLectures()) {
-				assertTrue(dependentLecture.getGroup() == requiredLecture.getGroup(),
-						"Lecture " + dependentLecture.getName() + "depends on lecture " +
-								requiredLecture.getName() +
-						", but the two lectures are held in different groups.");
-
-				if (!requiredLecture.isTakingPlace()) {
-					abort("Lecture " + dependentLecture + " depends on lecture " +
-							requiredLecture + ", but this lecture is not taught at all.");
-				}
-				else {
-					AllenRelation allenRelation = AllenRelation.getAllenRelation(requiredLecture.getTimeSpan(),
-							dependentLecture.getTimeSpan());
-					switch (allenRelation) {
-					case BEFORE:
-					case MEETS:
-						break;
-					default:
-						abort("Lecture " + dependentLecture + " depends on lecture " +
-								requiredLecture + ", but this lecture is not taught before the other lecture\n" +
-								"(Allen relation between required and dependent lecture is " + allenRelation.name() + ")");
-					}
-				}
-			}
-		}
-
-		/*
-		 * 2.2 Lectures of the same group or the same lecturer may not overlap.
-		 *     One room can be used for only one lecture at a given point of time.
-		 */
-
-		for (Lecturer lecturer : lecturers) {
-			abortIfOverlap((new LecturerPredicate(lecturer)).apply(heldLectures),
-					"lectures of the same lecturer may not overlap");
-		}
-
-		for (Group group : groups.values()) {
-			abortIfOverlap((new GroupPredicate(group)).apply(heldLectures),
-					"lectures of the same group may not overlap");
-		}
-
-		for (Room room : rooms) {
-			abortIfOverlap((new RoomPredicate(room)).apply(heldLectures),
-					"lectures in the same room may not overlap");
-		}
-
-		/*
-		 * 2.3 There has to be a break between two lectures of length two for both the lecturers and the
-		 * seminar group.
-		 */
-		ArrayList<Lecture> lengthTwoLectures = (new DurationPredicate(2)).apply(heldLectures);
-		for (Lecture lecture1 : lengthTwoLectures) {
-			for (Lecture lecture2 : lengthTwoLectures) {
-				if (lecture1 == lecture2)
-					continue;
-
-				AllenRelation rel = AllenRelation.getAllenRelation(lecture1.getTimeSpan(),
-						lecture2.getTimeSpan());
-
-				if (rel == AllenRelation.MEETS) {
-					abort("Lecture " + lecture1.toString() + " is held directly after " + lecture2.toString() +
-							", but both lectures are of length two.");
-				}
-			}
-		}
-
-		System.out.println("All checks passed. File appears to be valid.");
-		System.exit(0);
+		return seminarplanung;
 	}
 
-	private static void abortIfOverlap(ArrayList<Lecture> lectures, String cond) {
-		for (Lecture lecture1 : lectures) {
-			for (Lecture lecture2 : lectures) {
-				if (lecture1 == lecture2)
-					continue;
-
-				if (lecture1.overlapsWith(lecture2))
-					abort("Lecture " + lecture1.toString() + " overlaps with lecture " + lecture2.toString() + ", but " + cond + "\n");
-			}
-		}
-	}
-
-	private static void abort(String errMsg) {
+	private static void logError(String errMsg) {
 		System.err.println(errMsg);
-		System.err.println("Abort.");
-		System.exit(1);
 	}
-
-	private static void assertTrue(boolean assertion, String errMsg) {
-		if (!assertion)
-			abort(errMsg);
-	}
-
 }
