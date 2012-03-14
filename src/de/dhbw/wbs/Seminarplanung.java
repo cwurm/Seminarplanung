@@ -140,7 +140,7 @@ public final class Seminarplanung {
 					continue;
 
 				if (lecture1.overlapsWith(lecture2)) {
-					logError("Lecture " + lecture1.toString() + " overlaps with lecture " + lecture2.toString() + "\n");
+					logError("Lecture " + lecture1.toString() + " overlaps with lecture " + lecture2.toString());
 					return true;
 				}
 			}
@@ -265,6 +265,7 @@ public final class Seminarplanung {
 				lecture.setDuration(Integer.parseInt(elems[4]));
 
 				lectures.put(new Integer(lecture.getNumber()), lecture);
+				seminarplanung.addLecture(lecture);
 			}
 
 			/*
