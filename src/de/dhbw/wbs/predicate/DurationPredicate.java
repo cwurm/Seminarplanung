@@ -11,6 +11,6 @@ public class DurationPredicate extends Predicate<Lecture> {
 
 	@Override
 	public boolean matches(Lecture aLecture) {
-		return aLecture.getDuration() == duration;
+		return aLecture.getDuration() == this.duration;
 	}
 }
