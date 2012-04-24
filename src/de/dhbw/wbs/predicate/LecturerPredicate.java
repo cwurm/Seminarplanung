@@ -12,6 +12,6 @@ public class LecturerPredicate extends Predicate<Lecture> {
 
 	@Override
 	public boolean matches(Lecture aLecture) {
-		return aLecture.getLecturer().equals(lecturer);
+		return aLecture.getLecturer().equals(this.lecturer);
 	}
 }

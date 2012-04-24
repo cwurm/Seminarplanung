@@ -12,6 +12,6 @@ public class GroupPredicate extends Predicate<Lecture> {
 
 	@Override
 	public boolean matches(Lecture aLecture) {
-		return aLecture.getGroup().equals(group);
+		return aLecture.getGroup().equals(this.group);
 	}
 }

@@ -27,7 +27,7 @@ public final class Seminarplanung {
 	}
 
 	public void addLecture(Lecture lecture) {
-		lectures.add(lecture);
+		this.lectures.add(lecture);
 	}
 
 	public boolean isValid() {
@@ -157,7 +157,7 @@ public final class Seminarplanung {
 				return aLecture.isTakingPlace();
 			}
 
-		}).apply(lectures);
+		}).apply(this.lectures);
 
 		return heldLectures;
 	}
@@ -165,7 +165,7 @@ public final class Seminarplanung {
 	public ArrayList<Group> getGroups() {
 		ArrayList<Group> groups = new ArrayList<Group>();
 
-		for (Lecture lecture : lectures) {
+		for (Lecture lecture : this.lectures) {
 			if (!groups.contains(lecture.getGroup()))
 				groups.add(lecture.getGroup());
 		}
@@ -176,7 +176,7 @@ public final class Seminarplanung {
 	public ArrayList<Lecturer> getLecturers() {
 		ArrayList<Lecturer> lecturers = new ArrayList<Lecturer>();
 
-		for (Lecture lecture : lectures) {
+		for (Lecture lecture : this.lectures) {
 			if (!lecturers.contains(lecture.getLecturer()))
 				lecturers.add(lecture.getLecturer());
 		}
@@ -187,7 +187,7 @@ public final class Seminarplanung {
 	public ArrayList<Room> getRooms() {
 		ArrayList<Room> rooms = new ArrayList<Room>();
 
-		for (Lecture lecture : lectures) {
+		for (Lecture lecture : this.lectures) {
 			if (!rooms.contains(lecture.getRoom()))
 				rooms.add(lecture.getRoom());
 		}
